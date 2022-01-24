@@ -14,9 +14,9 @@ ADMIN_USERNAME=root
 
 schemaBeingRemoved="SHOW DATABASES like '${SERVICE}\_%'"
 
-for database_name in $(mysql -B --disable-column-names -u "${ADMIN_USERNAME}" -e "${schemaBeingRemoved}")
+for database_name in $(mariadb -B --disable-column-names -u "${ADMIN_USERNAME}" -e "${schemaBeingRemoved}")
 do
   echo "Deleting service account '${database_name}'"
-  mysql -u "${ADMIN_USERNAME}" -e "DROP DATABASE if exists ${database_name};" >/dev/null 2>&1
-  mysql -u "${ADMIN_USERNAME}" -e "DROP USER if exists ${database_name};" >/dev/null 2>&1
+  mariadb -u "${ADMIN_USERNAME}" -e "DROP DATABASE if exists ${database_name};" >/dev/null 2>&1
+  mariadb -u "${ADMIN_USERNAME}" -e "DROP USER if exists ${database_name};" >/dev/null 2>&1
 done
