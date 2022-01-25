@@ -39,7 +39,7 @@ teardown() {
   run /workspace/resources/remove-sa.sh mydogu
 
   assert_success
-  assert_output "Deleting service account 'mydogu_12345678'"
+  assert_line "Deleting service account 'mydogu_12345678'"
   assert_equal "$(mock_get_call_num "${mariadb}")" "4"
 
   assert_equal "$(mock_get_call_args "${mariadb}" "1")" "-umysql -B --disable-column-names -e SHOW DATABASES like 'mydogu\_%'"
