@@ -40,10 +40,10 @@ teardown() {
   run /workspace/resources/create-sa.sh "${GENERIC_DOGU_NAME}"
 
   assert_success
-  assert_equal  "${#lines[@]}" 3
-  assert_equal  "${lines[0]}" 'database: mydogu_rndDbName'
-  assert_equal  "${lines[1]}" 'username: mydogu_rndDbName'
-  assert_equal  "${lines[2]}" 'password: s3cR37p455w0rD'
+  assert_equal "${#lines[@]}" 3
+  assert_equal "${lines[0]}" 'database: mydogu_rndDbName'
+  assert_equal "${lines[1]}" 'username: mydogu_rndDbName'
+  assert_equal "${lines[2]}" 'password: s3cR37p455w0rD'
   assert_equal "$(mock_get_call_num "${mariadb}")" "2"
   assert_equal "$(mock_get_call_args "${mariadb}" "1")" "-u root -e CREATE DATABASE mydogu_rndDbName DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;"
   assert_equal "$(mock_get_call_args "${mariadb}" "2")" '-u root -e grant all on mydogu_rndDbName.* to "mydogu_rndDbName"@"%" identified by "s3cR37p455w0rD";FLUSH PRIVILEGES;'
@@ -62,8 +62,7 @@ teardown() {
   run /workspace/resources/create-sa.sh
 
   assert_failure
-  assert_equal  "${#lines[@]}" 1
-  assert_equal  "${lines[0]}" 'asdf'
+  assert_line  'usage create-sa.sh servicename'
   assert_equal "$(mock_get_call_num "${mariadb}")" "0"
   assert_equal "$(mock_get_call_num "${doguctl}")" "0"
 }

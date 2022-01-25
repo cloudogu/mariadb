@@ -1,12 +1,12 @@
 #!/bin/bash -e
 
-{
-    SERVICE="$1"
-    if [ X"${SERVICE}" = X"" ]; then
-        echo "usage create-sa.sh servicename"
-        exit 1
-    fi
+SERVICE="$1"
+if [[ X"${SERVICE}" == X"" ]]; then
+    echo "usage create-sa.sh servicename"
+    exit 1
+fi
 
+{
     # create random schema suffix and password
     SCHEMA="${SERVICE}_$(doguctl random -l 6)"
     PASSWORD=$(doguctl random)
