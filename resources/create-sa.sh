@@ -12,10 +12,11 @@ fi
     PASSWORD=$(doguctl random)
 
     # create database
-    mariadb -u root -e "CREATE DATABASE ${SCHEMA} DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;"
+    mariadb -umysql -e "CREATE DATABASE ${SCHEMA} DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;"
     
     # grant access for user
-    mariadb -u root -e "grant all on ${SCHEMA}.* to \"${SCHEMA}\"@\"%\" identified by \"${PASSWORD}\";FLUSH PRIVILEGES;"
+    mariadb -umysql -e "grant all on ${SCHEMA}.* to \"${SCHEMA}\"@\"%\" identified by \"${PASSWORD}\";"
+    mariadb -umysql -e "FLUSH PRIVILEGES;" >/dev/null 2>&1
 } >/dev/null 2>&1
 
 # print details

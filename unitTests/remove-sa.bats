@@ -9,6 +9,7 @@ load '/workspace/target/bats_libs/bats-assert/load.bash'
 load '/workspace/target/bats_libs/bats-mock/load.bash'
 load '/workspace/target/bats_libs/bats-file/load.bash'
 
+GENERIC_DOGU_NAME="mydogu"
 
 setup() {
   export STARTUP_DIR=/workspace/resources
@@ -29,40 +30,36 @@ teardown() {
   rm "${BATS_TMPDIR}/doguctl"
 }
 
-@test "create-sa.sh should print the credentials" {
+@test "remove-sa.sh should print the credentials" {
   mock_set_status "${mariadb}" 0
   mock_set_status "${doguctl}" 0
+  mock_set_output "${mariadb}" "mydogu_12345678" 1
+  mock_set_output "${mariadb}" "dontCare" 2
 
-  mock_set_output "${doguctl}" "rndDbName" 1
-  mock_set_output "${doguctl}" "s3cR37p455w0rD" 2
-
-  run /workspace/resources/create-sa.sh mydogu
+  run /workspace/resources/remove-sa.sh mydogu
 
   assert_success
-  assert_equal "${#lines[@]}" 3
-  assert_equal "${lines[0]}" 'database: mydogu_rndDbName'
-  assert_equal "${lines[1]}" 'username: mydogu_rndDbName'
-  assert_equal "${lines[2]}" 'password: s3cR37p455w0rD'
-  assert_equal "$(mock_get_call_num "${mariadb}")" "3"
-  assert_equal "$(mock_get_call_args "${mariadb}" "1")" "-umysql -e CREATE DATABASE mydogu_rndDbName DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;"
-  assert_equal "$(mock_get_call_args "${mariadb}" "2")" '-umysql -e grant all on mydogu_rndDbName.* to "mydogu_rndDbName"@"%" identified by "s3cR37p455w0rD";'
-  assert_equal "$(mock_get_call_args "${mariadb}" "3")" "-umysql -e FLUSH PRIVILEGES;"
-  assert_equal "$(mock_get_call_num "${doguctl}")" "2"
-  assert_equal "$(mock_get_call_args "${doguctl}" "1")" "random -l 6"
-  assert_equal "$(mock_get_call_args "${doguctl}" "2")" "random"
+  assert_output "Deleting service account 'mydogu_12345678'"
+  assert_equal "$(mock_get_call_num "${mariadb}")" "4"
+
+  assert_equal "$(mock_get_call_args "${mariadb}" "1")" "-umysql -B --disable-column-names -e SHOW DATABASES like 'mydogu\_%'"
+  assert_equal "$(mock_get_call_args "${mariadb}" "2")" '-umysql -e DROP DATABASE if exists mydogu_12345678;'
+  assert_equal "$(mock_get_call_args "${mariadb}" "3")" '-umysql -e DROP USER if exists mydogu_12345678;'
+  assert_equal "$(mock_get_call_args "${mariadb}" "4")" '-umysql -e FLUSH PRIVILEGES;'
+  assert_equal "$(mock_get_call_num "${doguctl}")" "0"
 }
 
-@test "create-sa.sh should fail for missing dogu argument" {
+@test "remove-sa.sh should fail for missing dogu argument" {
   mock_set_status "${mariadb}" 0
   mock_set_status "${doguctl}" 0
 
   mock_set_output "${doguctl}" "rndDbName" 1
   mock_set_output "${doguctl}" "s3cR37p455w0rD" 2
 
-  run /workspace/resources/create-sa.sh
+  run /workspace/resources/remove-sa.sh
 
   assert_failure
-  assert_line  'usage create-sa.sh servicename'
+  assert_line  'usage remove-sa.sh servicename'
   assert_equal "$(mock_get_call_num "${mariadb}")" "0"
   assert_equal "$(mock_get_call_num "${doguctl}")" "0"
 }
