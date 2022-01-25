@@ -51,3 +51,19 @@ teardown() {
   assert_equal "$(mock_get_call_args "${doguctl}" "1")" "random -l 6"
   assert_equal "$(mock_get_call_args "${doguctl}" "2")" "random"
 }
+
+@test "create-sa.sh should fail for missing dogu argument" {
+  mock_set_status "${mariadb}" 0
+  mock_set_status "${doguctl}" 0
+
+  mock_set_output "${doguctl}" "rndDbName" 1
+  mock_set_output "${doguctl}" "s3cR37p455w0rD" 2
+
+  run /workspace/resources/create-sa.sh
+
+  assert_failure
+  assert_equal  "${#lines[@]}" 1
+  assert_equal  "${lines[0]}" 'asdf'
+  assert_equal "$(mock_get_call_num "${mariadb}")" "0"
+  assert_equal "$(mock_get_call_num "${doguctl}")" "0"
+}
