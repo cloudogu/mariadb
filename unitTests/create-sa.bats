@@ -9,6 +9,8 @@ load '/workspace/target/bats_libs/bats-assert/load.bash'
 load '/workspace/target/bats_libs/bats-mock/load.bash'
 load '/workspace/target/bats_libs/bats-file/load.bash'
 
+GENERIC_DOGU_NAME="mydogu"
+
 setup() {
   export STARTUP_DIR=/workspace/resources
   export WORKDIR=/workspace
@@ -17,8 +19,8 @@ setup() {
   doguctl="$(mock_create)"
   export bundle
   export PATH="${PATH}:${BATS_TMPDIR}"
-  ln -s "${rake}" "${BATS_TMPDIR}/mariadb"
-  ln -s "${bundle}" "${BATS_TMPDIR}/doguctl"
+  ln -s "${mariadb}" "${BATS_TMPDIR}/mariadb"
+  ln -s "${doguctl}" "${BATS_TMPDIR}/doguctl"
 }
 
 teardown() {
@@ -35,15 +37,17 @@ teardown() {
   mock_set_output "${doguctl}" "rndDbName" 1
   mock_set_output "${doguctl}" "s3cR37p455w0rD" 2
 
-  run /workspace/resources/create-sa.sh
+  run /workspace/resources/create-sa.sh "${GENERIC_DOGU_NAME}"
 
   assert_success
-  assert_line "user"
-  assert_line "password"
-  assert_line "database"
-  assert_equal "$(mock_get_call_num "${mariadb}")" "1"
-  assert_equal "$(mock_get_call_args "${mariadb}" "1")" "something"
+  assert_equal  "${#lines[@]}" 3
+  assert_equal  "${lines[0]}" 'database: mydogu_rndDbName'
+  assert_equal  "${lines[1]}" 'username: mydogu_rndDbName'
+  assert_equal  "${lines[2]}" 'password: s3cR37p455w0rD'
+  assert_equal "$(mock_get_call_num "${mariadb}")" "2"
+  assert_equal "$(mock_get_call_args "${mariadb}" "1")" "-u root -e CREATE DATABASE mydogu_rndDbName DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;"
+  assert_equal "$(mock_get_call_args "${mariadb}" "2")" '-u root -e grant all on mydogu_rndDbName.* to "mydogu_rndDbName"@"%" identified by "s3cR37p455w0rD";FLUSH PRIVILEGES;'
   assert_equal "$(mock_get_call_num "${doguctl}")" "2"
-  assert_equal "$(mock_get_call_args "${doguctl}" "1")" "random -l 5"
+  assert_equal "$(mock_get_call_args "${doguctl}" "1")" "random -l 6"
   assert_equal "$(mock_get_call_args "${doguctl}" "2")" "random"
 }
