@@ -27,13 +27,21 @@ if [ ! -f /var/lib/mysql/ibdata1 ]; then
     doguctl wait --port 3306
 
     # set generated root password
-    mysql -uroot -e "GRANT ALL PRIVILEGES ON *.* TO root@'%' IDENTIFIED BY \"${MYSQL_ROOT_PASSWORD}\" WITH GRANT OPTION;"
+    mysql -umysql -e "GRANT ALL PRIVILEGES ON *.* TO root@'%' IDENTIFIED BY \"${MYSQL_ROOT_PASSWORD}\" WITH GRANT OPTION;"
 
     # secure the installation
-    # http://www.jbmurphy.com/2011/06/20/mysql_secure_installation/
-    mysql -uroot -e "DROP DATABASE test;"
-    mysql -uroot -e "DELETE FROM mysql.user WHERE User=\";\""
-    mysql -uroot -e "FLUSH PRIVILEGES;"
+    # https://github.com/twitter-forks/mysql/blob/master/scripts/mysql_secure_installation.sh
+    mysql -umysql -e "DROP DATABASE test;"
+    mysql -umysql -e "DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%'"
+
+    #remove anonymous user
+    mysql -umysql -e "DELETE FROM mysql.user WHERE User=\";\""
+
+    # remove remote root
+    mysql -umysql -e "DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');"
+
+    # reload privilege tables
+    mysql -umysql -e "FLUSH PRIVILEGES;"
 
     # set stage for health check
     doguctl state ready

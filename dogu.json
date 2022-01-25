@@ -27,10 +27,13 @@
     "Command": "/remove-sa.sh"
   }
   ],
-  "HealthChecks": [{
-    "Type": "tcp",
-    "Port": 3306
-  },{
-    "Type": "state"
-  }]
+  "HealthChecks": [
+    {
+      "Type": "tcp",
+      "Port": 3306
+    },
+    {
+      "Type": "state"
+    }
+  ]
 }
