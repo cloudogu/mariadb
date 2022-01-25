@@ -71,8 +71,7 @@ teardown() {
   assert_equal "$(mock_get_call_args "${doguctl}" "1")" "state installing"
   assert_equal "$(mock_get_call_args "${mysql_install_db}" "1")" "--user=mysql --datadir=/var/lib/mysql"
 
-  # This case tests only IF the mock gets called, because of the mysqld_safe execution in the background
-  assert_equal "$(mock_get_call_num "${mysqld_safe}")" "1"
+  # Mock mysqld_safe will not get tested because of the execution in the background
   assert_equal "$(mock_get_call_num "${doguctl}")" "1"
 }
 
