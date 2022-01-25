@@ -29,9 +29,11 @@ teardown() {
 }
 
 @test "create-sa.sh should print the credentials" {
-
   mock_set_status "${mariadb}" 0
   mock_set_status "${doguctl}" 0
+
+  mock_set_output "${doguctl}" "rndDbName" 1
+  mock_set_output "${doguctl}" "s3cR37p455w0rD" 2
 
   run /workspace/resources/create-sa.sh
 
@@ -41,6 +43,7 @@ teardown() {
   assert_line "database"
   assert_equal "$(mock_get_call_num "${mariadb}")" "1"
   assert_equal "$(mock_get_call_args "${mariadb}" "1")" "something"
-  assert_equal "$(mock_get_call_num "${doguctl}")" "1"
-  assert_equal "$(mock_get_call_args "${doguctl}" "1")" "something"
+  assert_equal "$(mock_get_call_num "${doguctl}")" "2"
+  assert_equal "$(mock_get_call_args "${doguctl}" "1")" "random -l 5"
+  assert_equal "$(mock_get_call_args "${doguctl}" "2")" "random"
 }
