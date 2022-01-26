@@ -19,11 +19,11 @@ file:
     owner: root
     group: root
     filetype: file
-#  /upgrade-notification.sh:
-#    exists: true
-#    owner: root
-#    group: root
-#    filetype: file
+  /upgrade-notification.sh:
+    exists: true
+    owner: root
+    group: root
+    filetype: file
   /var/lib/mariab:
     exists: true
     owner: mariadb
