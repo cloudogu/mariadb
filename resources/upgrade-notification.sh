@@ -21,6 +21,7 @@ function handleUpgradeToX() {
   #echo "Please consider a backup before doing so, e.g. via the Backup dogu!"
   #echo "During the upgrade process a full database dump will be created."
   #echo "Therefore please make sure your harddrive has at least as much free space left as your Mariadb database currently occupies!"
+  echo ""
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
