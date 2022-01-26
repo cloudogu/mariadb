@@ -31,6 +31,8 @@ EXPOSE 3306
 
 HEALTHCHECK CMD doguctl healthy mariadb || exit 1
 
-USER "${USER}"
+# Re-using user and group outweighs negative outcomes
+# dockerfile_lint - ignore
+USER "${USER}":"${GROUP}"
 
 CMD ["/startup.sh"]
