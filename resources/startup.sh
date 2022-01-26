@@ -4,6 +4,7 @@ set -o nounset
 set -o pipefail
 
 DATABASE_STORAGE=/var/lib/mariadb/ibdata1
+DOGU_LOGLEVEL=2
 
 function runMain() {
   # the directory /var/run/mysqld is hardcoded in the mariadb config and should not be renamed to /var/run/mariadbd
@@ -34,10 +35,33 @@ function initMariaDB() {
   wait "${pid}" || true
 }
 
+function setDoguLogLevel() {
+  currentLogLevel=$(doguctl config --default "WARN" "logging/root")
+
+  case "${currentLogLevel}" in
+    "ERROR")
+      DOGU_LOGLEVEL=1
+    ;;
+    "INFO")
+      DOGU_LOGLEVEL=3
+    ;;
+    "DEBUG")
+      DOGU_LOGLEVEL=9
+    ;;
+    *)
+      DOGU_LOGLEVEL=2
+    ;;
+  esac
+}
+
 function regularMariaDBStart() {
   doguctl state ready
 
-  mariadbd_safe --user=mariadb --datadir='/var/lib/mariadb'
+  setDoguLogLevel
+
+  echo "Starting mariadb with loglevel ${DOGU_LOGLEVEL}"
+
+  mariadbd_safe --user=mariadb --datadir='/var/lib/mariadb' --log-warnings="${DOGU_LOGLEVEL}"
 }
 
 function applySecurityConfiguration() {
