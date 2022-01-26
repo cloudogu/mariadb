@@ -6,26 +6,35 @@
   "Url": "https://mariadb.org/",
   "Category": "Base",
   "Tags": [
-    "database", "db"
+    "database",
+    "db"
   ],
   "Logo": "https://cloudogu.com/images/dogus/mariadb.png",
   "Image": "registry.cloudogu.com/official/mariadb",
-  "Volumes": [{
-    "Name": "data",
-    "Path": "/var/lib/mariadb",
-    "Owner": "1000",
-    "Group": "1000"
-  }],
-  "ExposedCommands": [{
-    "Name": "service-account-create",
-    "Description": "Creates a new service account",
-    "Command": "/create-sa.sh"
-  },
-  {
-    "Name": "service-account-remove",
-    "Description": "Removes a service account",
-    "Command": "/remove-sa.sh"
-  }
+  "Volumes": [
+    {
+      "Name": "data",
+      "Path": "/var/lib/mariadb",
+      "Owner": "1000",
+      "Group": "1000"
+    }
+  ],
+  "ExposedCommands": [
+    {
+      "Name": "service-account-create",
+      "Description": "Creates a new service account",
+      "Command": "/create-sa.sh"
+    },
+    {
+      "Name": "service-account-remove",
+      "Description": "Removes a service account",
+      "Command": "/remove-sa.sh"
+    },
+    {
+      "Name": "upgrade-notification",
+      "Description": "Informs the user on critical updates",
+      "Command": "/upgrade-notification.sh"
+    }
   ],
   "HealthChecks": [
     {
