@@ -1,18 +1,18 @@
 {
-  "Name": "official/mysql",
+  "Name": "official/mariadb",
   "Version": "10.1.22-2",
-  "DisplayName": "MySQL/MariaDB",
-  "Description": "MySQL/MariaDB Database.",
-  "Url": "https://mariadb.com/",
+  "DisplayName": "MariaDB",
+  "Description": "MariaDB - The open source relational database",
+  "Url": "https://mariadb.org/",
   "Category": "Base",
   "Tags": [
     "database", "db"
   ],
-  "Logo": "https://cloudogu.com/images/dogus/mysql.png",
-  "Image": "registry.cloudogu.com/official/mysql",
+  "Logo": "https://cloudogu.com/images/dogus/mariadb.png",
+  "Image": "registry.cloudogu.com/official/mariadb",
   "Volumes": [{
     "Name": "data",
-    "Path": "/var/lib/mysql",
+    "Path": "/var/lib/mariadb",
     "Owner": "1000",
     "Group": "1000"
   }],

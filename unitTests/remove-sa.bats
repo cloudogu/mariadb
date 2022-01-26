@@ -42,10 +42,10 @@ teardown() {
   assert_line "Deleting service account 'mydogu_12345678'"
   assert_equal "$(mock_get_call_num "${mariadb}")" "4"
 
-  assert_equal "$(mock_get_call_args "${mariadb}" "1")" "-umysql -B --disable-column-names -e SHOW DATABASES like 'mydogu\_%'"
-  assert_equal "$(mock_get_call_args "${mariadb}" "2")" '-umysql -e DROP DATABASE if exists mydogu_12345678;'
-  assert_equal "$(mock_get_call_args "${mariadb}" "3")" '-umysql -e DROP USER if exists mydogu_12345678;'
-  assert_equal "$(mock_get_call_args "${mariadb}" "4")" '-umysql -e FLUSH PRIVILEGES;'
+  assert_equal "$(mock_get_call_args "${mariadb}" "1")" "-umariadb -B --disable-column-names -e SHOW DATABASES like 'mydogu\_%'"
+  assert_equal "$(mock_get_call_args "${mariadb}" "2")" '-umariadb -e DROP DATABASE if exists mydogu_12345678;'
+  assert_equal "$(mock_get_call_args "${mariadb}" "3")" '-umariadb -e DROP USER if exists mydogu_12345678;'
+  assert_equal "$(mock_get_call_args "${mariadb}" "4")" '-umariadb -e FLUSH PRIVILEGES;'
   assert_equal "$(mock_get_call_num "${doguctl}")" "0"
 }
 

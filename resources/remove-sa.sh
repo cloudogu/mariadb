@@ -11,10 +11,10 @@ fi
 
 schemaBeingRemoved="SHOW DATABASES like '${SERVICE}\_%'"
 
-for database_name in $(mariadb -umysql -B --disable-column-names -e "${schemaBeingRemoved}")
+for database_name in $(mariadb -umariadb -B --disable-column-names -e "${schemaBeingRemoved}")
 do
   echo "Deleting service account '${database_name}'"
-  mariadb -umysql -e "DROP DATABASE if exists ${database_name};" >/dev/null 2>&1
-  mariadb -umysql -e "DROP USER if exists ${database_name};" >/dev/null 2>&1
-  mariadb -umysql -e "FLUSH PRIVILEGES;" >/dev/null 2>&1
+  mariadb -umariadb -e "DROP DATABASE if exists ${database_name};" >/dev/null 2>&1
+  mariadb -umariadb -e "DROP USER if exists ${database_name};" >/dev/null 2>&1
+  mariadb -umariadb -e "FLUSH PRIVILEGES;" >/dev/null 2>&1
 done
