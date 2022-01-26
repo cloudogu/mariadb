@@ -15,7 +15,7 @@ setup() {
   export STARTUP_DIR=/workspace/resources
   export WORKDIR=/workspace
   mariadb="$(mock_create)"
-  export rake
+  export mariadb
   doguctl="$(mock_create)"
   export bundle
   export PATH="${PATH}:${BATS_TMPDIR}"

@@ -1,9 +1,9 @@
 file:
-#  /backup-consumer.sh:
-#    exists: true
-#    owner: root
-#    group: root
-#    filetype: file
+  /backup-consumer.sh:
+    exists: true
+    owner: root
+    group: root
+    filetype: file
   /create-sa.sh:
     exists: true
     owner: root

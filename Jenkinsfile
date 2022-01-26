@@ -10,8 +10,8 @@ node('docker') {
 
     stage('Lint') {
         lintDockerfile()
-//            "resources/backup-consumer.sh resources/create-sa.sh resources/remove-sa.sh resources/pre-upgrade.sh resources/startup.sh resources/upgrade-notification.sh"
-         shellCheck("resources/create-sa.sh resources/remove-sa.sh resources/startup.sh")
+//            "resources/pre-upgrade.sh"
+         shellCheck("resources/create-sa.sh resources/remove-sa.sh resources/startup.sh resources/upgrade-notification.sh resources/backup-consumer.sh")
     }
 
     stage('Shell tests') {

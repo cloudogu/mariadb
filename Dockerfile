@@ -17,6 +17,7 @@ RUN set -eux -o pipefail \
   # add symlinks to simplify shell tests because dashed binaries are hard to mock
   && ln -s /usr/bin/mariadb-install-db /usr/bin/mariadb_install_db \
   && ln -s /usr/bin/mariadbd-safe /usr/bin/mariadbd_safe \
+  && ln -s /usr/bin/mariadbd-dump /usr/bin/mariadb_dump \
   && rm -rf /var/cache/apk/*  \
   && mkdir /var/run/mysqld \
   && chown -R "${USER}":"${GROUP}" "${MARIADB_VOLUME}" /var/run/mysqld \
