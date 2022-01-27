@@ -39,7 +39,8 @@ END_HEREDOC
   run /workspace/resources/backup-consumer.sh <<< "${doguServiceAccountData}"
 
   assert_success
-  assert_output "DATA GOES HERE HURRAY"
+  # favour assert_line over assert_output here because Jenkins creates weird output over a non existing ID
+  assert_line "DATA GOES HERE HURRAY"
   assert_equal "$(mock_get_call_num "${mariadb_dump}")" "1"
   assert_equal "$(mock_get_call_args "${mariadb_dump}" "1")" "redmine_567890"
 }
