@@ -6,7 +6,9 @@ set -o pipefail
 function checkMajorUpgrade() {
   FROM_VERSION="${1}"
   TO_VERSION="${2}"
+  # shellcheck disable=SC2034
   FROM_MAJOR_VERSION=$(echo "${FROM_VERSION}" | cut -d '.' -f1)
+  # shellcheck disable=SC2034
   TO_MAJOR_VERSION=$(echo "${TO_VERSION}" | cut -d '.' -f1)
   #CRITICAL_VERSION_X="1"
 
