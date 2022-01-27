@@ -14,13 +14,13 @@ setup() {
   export WORKDIR=/workspace
   doguctl="$(mock_create)"
   mariadb_install_db="$(mock_create)"
-  mariadbd_safe="$(mock_create)"
+  mariadbd="$(mock_create)"
   mariadb="$(mock_create)"
 
   export PATH="${PATH}:${BATS_TMPDIR}"
   ln -s "${doguctl}" "${BATS_TMPDIR}/doguctl"
   ln -s "${mariadb_install_db}" "${BATS_TMPDIR}/mariadb_install_db"
-  ln -s "${mariadbd_safe}" "${BATS_TMPDIR}/mariadbd_safe"
+  ln -s "${mariadbd}" "${BATS_TMPDIR}/mariadbd"
   ln -s "${mariadb}" "${BATS_TMPDIR}/mariadb"
 }
 
@@ -29,7 +29,7 @@ teardown() {
   unset WORKDIR
   rm "${BATS_TMPDIR}/mariadb_install_db"
   rm "${BATS_TMPDIR}/doguctl"
-  rm "${BATS_TMPDIR}/mariadbd_safe"
+  rm "${BATS_TMPDIR}/mariadbd"
   rm "${BATS_TMPDIR}/mariadb"
 }
 
@@ -37,7 +37,7 @@ teardown() {
   # shellcheck source=/workspace/resources/startup.sh
   source "${STARTUP_DIR}/startup.sh"
 
-  mock_set_status "${mariadbd_safe}" 0
+  mock_set_status "${mariadbd}" 0
   mock_set_status "${doguctl}" 0
 
   DATABASE_STORAGE="$(mktemp)"
@@ -46,10 +46,11 @@ teardown() {
   run runMain
 
   assert_success
-  assert_equal "$(mock_get_call_args "${mariadbd_safe}" "1")" "--user=mariadb --datadir=/var/lib/mariadb"
-  assert_equal "$(mock_get_call_args "${doguctl}" "1")" "state ready"
-  assert_equal "$(mock_get_call_num "${mariadbd_safe}")" "1"
-  assert_equal "$(mock_get_call_num "${doguctl}")" "1"
+  assert_equal "$(mock_get_call_args "${mariadbd}" "1")" "--user=mariadb --datadir=/var/lib/mariadb --log-warnings=2"
+  assert_equal "$(mock_get_call_num "${mariadbd}")" "1"
+  assert_equal "$(mock_get_call_args "${doguctl}" "1")" "config --default WARN logging/root"
+  assert_equal "$(mock_get_call_args "${doguctl}" "2")" "state ready"
+  assert_equal "$(mock_get_call_num "${doguctl}")" "2"
 }
 
 @test "initMariaDB" {
@@ -58,7 +59,7 @@ teardown() {
 
   mock_set_status "${doguctl}" 0
   mock_set_status "${mariadb_install_db}" 0
-  mock_set_status "${mariadbd_safe}" 0
+  mock_set_status "${mariadbd}" 0
 
   function applySecurityConfiguration () {
    echo ""
@@ -70,7 +71,7 @@ teardown() {
   assert_equal "$(mock_get_call_args "${doguctl}" "1")" "state installing"
   assert_equal "$(mock_get_call_args "${mariadb_install_db}" "1")" "--user=mariadb --datadir=/var/lib/mariadb"
 
-  # Mock mariadbd_safe will not get tested because of the execution in the background
+  # Mock mariadbd will not get tested because of the execution in the background
   assert_equal "$(mock_get_call_num "${doguctl}")" "1"
 }
 

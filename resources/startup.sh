@@ -58,6 +58,7 @@ function regularMariaDBStart() {
 
   setDoguLogLevel
 
+  doguctl state ready
   mariadbd --user=mariadb --datadir='/var/lib/mariadb' --log-warnings="${DOGU_LOGLEVEL}"
 }
 
