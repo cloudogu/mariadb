@@ -24,14 +24,13 @@ function initMariaDB() {
   mariadb_install_db --user=mariadb --datadir="/var/lib/mariadb"
 
   # start daemon in background
-  mariadbd_safe --user=mariadb --datadir='/var/lib/mariadb' &
-
+  mariadbd --user=mariadb --datadir='/var/lib/mariadb' &
   pid=$!
 
   applySecurityConfiguration
 
+  echo "Stopping database finishing installation..."
   kill "${pid}"
-
   wait "${pid}" || true
 }
 
@@ -61,10 +60,11 @@ function regularMariaDBStart() {
 
   echo "Starting mariadb with loglevel ${DOGU_LOGLEVEL}"
 
-  mariadbd_safe --user=mariadb --datadir='/var/lib/mariadb' --log-warnings="${DOGU_LOGLEVEL}"
+  mariadbd --user=mariadb --datadir='/var/lib/mariadb' --log-warnings="${DOGU_LOGLEVEL}"
 }
 
 function applySecurityConfiguration() {
+  echo "Applying security configuration..."
   # create random root password
   MARIADB_ROOT_PASSWORD=$(doguctl random)
 

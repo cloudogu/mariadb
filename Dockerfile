@@ -18,9 +18,12 @@ RUN set -eux -o pipefail \
   && ln -s /usr/bin/mariadb-install-db /usr/bin/mariadb_install_db \
   && ln -s /usr/bin/mariadbd-safe /usr/bin/mariadbd_safe \
   && ln -s /usr/bin/mariadbd-dump /usr/bin/mariadb_dump \
+  # support docker logging to stdout
+  && mkdir -p /opt/lib/mariadb \
+  && ln -sf /dev/stdout /opt/lib/mariadb/mariadb.err \
   && rm -rf /var/cache/apk/*  \
   && mkdir /var/run/mysqld \
-  && chown -R "${USER}":"${GROUP}" "${MARIADB_VOLUME}" /var/run/mysqld \
+  && chown -R "${USER}":"${GROUP}" "${MARIADB_VOLUME}" /var/run/mysqld /opt/lib/mariadb \
   && sed -i "s|.*bind-address\s*=.*|bind-address=0.0.0.0|g" /etc/my.cnf.d/mariadb-server.cnf \
   && sed -i "s|^skip-networking$|#skip-networking|" /etc/my.cnf.d/mariadb-server.cnf
 
