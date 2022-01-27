@@ -35,11 +35,11 @@ function initMariaDB() {
 }
 
 function setDoguLogLevel() {
-  currentLogLevel=$(doguctl config --default "WARN" "logging/root")
+  currentLogLevel=$(doguctl config --default "ERROR" "logging/root")
 
   case "${currentLogLevel}" in
-    "ERROR")
-      DOGU_LOGLEVEL=1
+    "WARN")
+      DOGU_LOGLEVEL=2
     ;;
     "INFO")
       DOGU_LOGLEVEL=3
@@ -48,7 +48,7 @@ function setDoguLogLevel() {
       DOGU_LOGLEVEL=9
     ;;
     *)
-      DOGU_LOGLEVEL=2
+      DOGU_LOGLEVEL=1
     ;;
   esac
 }
@@ -57,8 +57,6 @@ function regularMariaDBStart() {
   doguctl state ready
 
   setDoguLogLevel
-
-  echo "Starting mariadb with loglevel ${DOGU_LOGLEVEL}"
 
   mariadbd --user=mariadb --datadir='/var/lib/mariadb' --log-warnings="${DOGU_LOGLEVEL}"
 }
