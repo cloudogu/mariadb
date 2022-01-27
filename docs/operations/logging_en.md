@@ -1,10 +1,12 @@
-# Mariadb logging
+# MariaDB logging
 
-Mariadb has an error, query, slow query and binary log.
+MariaDB has an error, query, slow query and binary log.
 The query and slow query log is not enabled due to privacy concerns.
 The binary log provides information if Mariadb is operated in the cluster and is therefore also not relevant.
 Only the error log is configured in the dogu. This also contains a warning log, which can be configured in different 
-levels. A detailed explanation can be found [here](https://mariadb.com/kb/en/error-log/).
+levels. 
+
+A detailed explanation can be found [here](https://mariadb.com/kb/en/error-log/).
 
 ## Mapping of the ERROR WARN INFO DEBUG levels
 
@@ -27,6 +29,11 @@ greater than maximum allowed size (8126) for a record on index leaf page.`
 ### WARN - 2
 
 The log level `WARN` represents the levels 0 to 2 of the error log.
+
+Please note if the log level is set a value which includes the `WARN` log level, that the container health check will create a warning like this every 30 seconds:
+```
+[Warning] Aborted connection 211 to db: 'unconnected' user: 'unauthenticated' host: '172.18.0.3' (This connection closed normally without authentication)
+```
 
 Messages in these class can be the following:
 

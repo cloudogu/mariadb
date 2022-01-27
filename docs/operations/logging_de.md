@@ -1,11 +1,12 @@
-# Mariadb logging
+# MariaDB logging
 
-Mariadb besitzt einen Error-, Query-, Slow-Query- und Binary-Log.
+MariaDB besitzt einen Error-, Query-, Slow-Query- und Binary-Log.
 Das Query- und Slow-Query-Log wird wegen des Datenschutzes nicht aktiviert.
 Das Binary-Log stellt Information bereit, falls Mariadb im Cluster betrieben wird und ist somit ebenfalls nicht relevant.
 In dem Dogu wird ausschließlich das Error-Log konfiguriert. Dieses beinhaltet zusätzlich noch ein Warning-Log, welches
 in verschiedenen Stufen konfigurierbar ist.
-Eine ausführliche Erläuterung ist [hier](https://mariadb.com/kb/en/error-log/) zu finden.
+
+Eine ausführliche Erläuterung befindet sich [hier](https://mariadb.com/kb/en/error-log/).
 
 ## Mapping der Level ERROR WARN INFO DEBUG
 
@@ -28,6 +29,11 @@ greater than maximum allowed size (8126) for a record on index leaf page.`
 ### WARN - 2
 
 Das Loglevel `WARN` stellt die Stufen 0 bis 2 des Error-Logs dar.
+
+Falls das Loglevel auf einen Wert gesetzt wurde, der `WARN` miteinbezieht, dann wird der Container-Health-Check alle 30 Sekunden eine Warnung wie diese generieren:
+```
+[Warning] Aborted connection 211 to db: 'unconnected' user: 'unauthenticated' host: '172.18.0.3' (This connection closed normally without authentication)
+```
 
 Meldungen in dieser Klassen können folgende sein:
 
