@@ -54,8 +54,6 @@ function setDoguLogLevel() {
 }
 
 function regularMariaDBStart() {
-  doguctl state ready
-
   setDoguLogLevel
 
   doguctl state ready

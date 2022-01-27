@@ -46,9 +46,9 @@ teardown() {
   run runMain
 
   assert_success
-  assert_equal "$(mock_get_call_args "${mariadbd}" "1")" "--user=mariadb --datadir=/var/lib/mariadb --log-warnings=2"
+  assert_equal "$(mock_get_call_args "${mariadbd}" "1")" "--user=mariadb --datadir=/var/lib/mariadb --log-warnings=1"
   assert_equal "$(mock_get_call_num "${mariadbd}")" "1"
-  assert_equal "$(mock_get_call_args "${doguctl}" "1")" "config --default WARN logging/root"
+  assert_equal "$(mock_get_call_args "${doguctl}" "1")" "config --default ERROR logging/root"
   assert_equal "$(mock_get_call_args "${doguctl}" "2")" "state ready"
   assert_equal "$(mock_get_call_num "${doguctl}")" "2"
 }
