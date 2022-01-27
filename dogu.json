@@ -1,6 +1,6 @@
 {
   "Name": "official/mariadb",
-  "Version": "10.1.22-2",
+  "Version": "10.5.13-1",
   "DisplayName": "MariaDB",
   "Description": "MariaDB - The open source relational database",
   "Url": "https://mariadb.org/",
