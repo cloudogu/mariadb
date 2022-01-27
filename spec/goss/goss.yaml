@@ -34,7 +34,7 @@ port:
     ip:
     - 0.0.0.0
 process:
-  mariadb:
+  mariadbd:
     running: true
 mount:
   /var/lib/mariadb:
