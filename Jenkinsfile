@@ -77,6 +77,23 @@ node('vagrant') {
                 ecoSystem.verify(doguDirectory)
             }
 
+            stage('End-to-end tests') {
+                try {
+                    def createOutput = ecoSystem.vagrant.sshOut('sudo cesapp command mariadb service-account-create mydogu')
+                    if (!createOutput.contains('username: mydogu_')) {
+                        error "ERROR: expected output to contain username but actually got: ${createOutput}"
+                    }
+
+                    def removeOutput = ecoSystem.vagrant.sshOut('sudo cesapp command mariadb service-account-remove mydogu')
+                    if (!removeOutput.contains("Deleting service account 'mydogu_")) {
+                        error "ERROR: expected output to contain message but actually got: ${removeOutput}"
+                    }
+                } catch (e) {
+                    // catch
+                    error "ERROR while running cesapp command: Message: ${e}"
+                }
+            }
+
             if (gitflow.isReleaseBranch()) {
                 String releaseVersion = git.getSimpleBranchName()
 
