@@ -44,7 +44,7 @@ teardown() {
   assert_equal "${lines[1]}" 'username: mydogu_rndDbName'
   assert_equal "${lines[2]}" 'password: s3cR37p455w0rD'
   assert_equal "$(mock_get_call_num "${mariadb}")" "3"
-  assert_equal "$(mock_get_call_args "${mariadb}" "1")" "-umariadb -e CREATE DATABASE mydogu_rndDbName DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;"
+  assert_equal "$(mock_get_call_args "${mariadb}" "1")" "-umariadb -e CREATE DATABASE mydogu_rndDbName DEFAULT CHARACTER SET utf8mb4 DEFAULT COLLATE utf8mb4_unicode_ci;"
   assert_equal "$(mock_get_call_args "${mariadb}" "2")" '-umariadb -e grant all on mydogu_rndDbName.* to "mydogu_rndDbName"@"%" identified by "s3cR37p455w0rD";'
   assert_equal "$(mock_get_call_args "${mariadb}" "3")" "-umariadb -e FLUSH PRIVILEGES;"
   assert_equal "$(mock_get_call_num "${doguctl}")" "2"
