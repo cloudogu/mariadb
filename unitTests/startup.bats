@@ -91,12 +91,13 @@ teardown() {
   assert_equal "$(mock_get_call_args "${doguctl}" "1")" "random"
   assert_equal "$(mock_get_call_args "${doguctl}" "2")" "wait --port 3306"
   assert_equal "$(mock_get_call_args "${mariadb}" "1")" "-umariadb -e GRANT ALL PRIVILEGES ON *.* TO root@'%' IDENTIFIED BY \"${password}\" WITH GRANT OPTION;"
-  assert_equal "$(mock_get_call_args "${mariadb}" "2")" "-umariadb -e DROP DATABASE test;"
-  assert_equal "$(mock_get_call_args "${mariadb}" "3")" "-umariadb -e DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%'"
-  assert_equal "$(mock_get_call_args "${mariadb}" "4")" "-umariadb -e DELETE FROM mysql.user WHERE User=\";\""
-  assert_equal "$(mock_get_call_args "${mariadb}" "5")" "-umariadb -e DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');"
+  assert_equal "$(mock_get_call_args "${mariadb}" "2")" "-umariadb -e DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');"
+  assert_equal "$(mock_get_call_args "${mariadb}" "3")" "-umariadb -e DROP DATABASE test;"
+  assert_equal "$(mock_get_call_args "${mariadb}" "4")" "-umariadb -e DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%';"
+  assert_equal "$(mock_get_call_args "${mariadb}" "5")" "-umariadb -e DELETE FROM mysql.user WHERE User='';"
   assert_equal "$(mock_get_call_args "${mariadb}" "6")" "-umariadb -e FLUSH PRIVILEGES;"
-  assert_equal "$(mock_get_call_num "${doguctl}")" "3"
+
+  assert_equal "$(mock_get_call_num "${doguctl}")" "2"
   assert_equal "$(mock_get_call_num "${mariadb}")" "6"
 }
 

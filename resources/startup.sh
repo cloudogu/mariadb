@@ -70,17 +70,16 @@ function applySecurityConfiguration() {
 
   # set generated root password (and do not save it in the etcd either for added security - we do not need root actually)
   mariadb -umariadb -e "GRANT ALL PRIVILEGES ON *.* TO root@'%' IDENTIFIED BY \"${MARIADB_ROOT_PASSWORD}\" WITH GRANT OPTION;"
+  # remove remote root
+  mariadb -umariadb -e "DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');"
 
   # secure the installation
   # https://github.com/twitter-forks/mysql/blob/master/scripts/mysql_secure_installation.sh
   mariadb -umariadb -e "DROP DATABASE test;"
-  mariadb -umariadb -e "DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%'"
+  mariadb -umariadb -e "DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%';"
 
   # remove anonymous user
-  mariadb -umariadb -e "DELETE FROM mysql.user WHERE User=\";\""
-
-  # remove remote root
-  mariadb -umariadb -e "DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');"
+  mariadb -umariadb -e "DELETE FROM mysql.user WHERE User='';"
 
   # reload privilege tables
   mariadb -umariadb -e "FLUSH PRIVILEGES;"
