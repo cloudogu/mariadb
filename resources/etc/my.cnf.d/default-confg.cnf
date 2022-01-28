@@ -1,0 +1,19 @@
+[mysqld]
+
+innodb_buffer_pool_size=456M
+#join_buffer_size=1M
+#sort_buffer_size=1M
+#read_buffer_size=1M
+max_connections=100
+innodb_log_file_size=16M
+tmp_table_size=32M
+max_heap_table_size=32M
+innodb_file_format=Barracuda
+innodb_large_prefix=1
+innodb_read_io_threads=32
+performance_schema = ON enable PFS
+
+# suggested by https://github.com/major/MySQLTuner-perl
+query_cache_size=0
+query_cache_type=0
+query_cache_limit=2M
