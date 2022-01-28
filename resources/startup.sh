@@ -65,13 +65,10 @@ function applySecurityConfiguration() {
   # create random root password
   MARIADB_ROOT_PASSWORD=$(doguctl random)
 
-  # store the password encrypted
-  doguctl config -e password "${MARIADB_ROOT_PASSWORD}"
-
   # wait until mariadb is ready to accept connections
   doguctl wait --port 3306
 
-  # set generated root password
+  # set generated root password (and do not save it in the etcd either for added security - we do not need root actually)
   mariadb -umariadb -e "GRANT ALL PRIVILEGES ON *.* TO root@'%' IDENTIFIED BY \"${MARIADB_ROOT_PASSWORD}\" WITH GRANT OPTION;"
 
   # secure the installation
