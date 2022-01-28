@@ -12,7 +12,7 @@ fi
     PASSWORD=$(doguctl random)
 
     # create database
-    mariadb -umariadb -e "CREATE DATABASE ${SCHEMA} DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;"
+    mariadb -umariadb -e "CREATE DATABASE ${SCHEMA} DEFAULT CHARACTER SET utf8mb4 DEFAULT COLLATE utf8mb4_unicode_ci;"
     
     # grant access for user
     mariadb -umariadb -e "grant all on ${SCHEMA}.* to \"${SCHEMA}\"@\"%\" identified by \"${PASSWORD}\";"
