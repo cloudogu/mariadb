@@ -5,11 +5,14 @@ set -o pipefail
 
 DATABASE_STORAGE=/var/lib/mariadb/ibdata1
 DOGU_LOGLEVEL=2
+CONTAINER_MEMORY_LIMIT_FILE=/sys/fs/cgroup/memory/memory.limit_in_bytes
 
 function runMain() {
   # the directory /var/run/mysqld is hardcoded in the mariadb config and should not be renamed to /var/run/mariadbd
   mkdir -p /var/run/mysqld
   chown -R mariadb:mariadb /var/run/mysqld
+
+  renderConfigFile
 
   if [[ ! -f "${DATABASE_STORAGE}" ]]; then
     initMariaDB
@@ -19,6 +22,7 @@ function runMain() {
 }
 
 function initMariaDB() {
+  echo "Installing MariaDB..."
   doguctl state installing
 
   mariadb_install_db --user=mariadb --datadir="/var/lib/mariadb"
@@ -51,6 +55,56 @@ function setDoguLogLevel() {
       DOGU_LOGLEVEL=1
     ;;
   esac
+}
+
+function renderConfigFile() {
+  echo "Rendering config file..."
+
+  INNODB_BUFFER_POOL_SIZE_IN_BYTES=calculateInnoDbBufferPoolSize
+  export INNODB_BUFFER_POOL_SIZE_IN_BYTES
+
+  doguctl template "${STARTUP_DIR}/default-config.cnf.tpl" "${STARTUP_DIR}/etc/my.cnf.d/default-config.cnf"
+}
+
+function calculateInnoDbBufferPoolSize() {
+  defaultInnoDbBufferPool512M="512M"
+  memoryLimitFromEtcd=$(doguctl config "container_config/memory_limit" -d "empty")
+  if [[ "${memoryLimitFromEtcd}" == "empty" ]]; then
+      echo "${defaultInnoDbBufferPool512M}"
+      return
+  fi
+
+  local memoryLimitExitCode=0
+  memoryLimitInBytes=$(cat < "${CONTAINER_MEMORY_LIMIT_FILE}" | tr -d '\n') || memoryLimitExitCode=$?
+  if [[ memoryLimitExitCode -ne 0 ]]; then
+    >&2 echo "ERROR: Error while receiving container memory limit: Exit code: ${memoryLimitExitCode}. Falling back to ${defaultInnoDbBufferPool512M} MB."
+
+    echo "${defaultInnoDbBufferPool512M}"
+    return
+  fi
+
+  if ! [[ ${memoryLimitInBytes} =~ ^[0-9]+$ ]] ; then
+    >&2 echo "ERROR: Memory limit file does not contain a number (found: ${memoryLimitInBytes}). Falling back to ${defaultInnoDbBufferPool512M} MB."
+
+    echo "${defaultInnoDbBufferPool512M}"
+    return
+  fi
+
+  if [[ ${memoryLimitInBytes} -lt 536870912 ]]; then
+    echo "${defaultInnoDbBufferPool512M}"
+    return
+  fi
+
+  innoDbBufferPool80percent=$(echo "${memoryLimitInBytes} * 80 / 100" | bc) || memoryLimitExitCode=$?
+  if [[ memoryLimitExitCode -ne 0 ]]; then
+    >&2 echo "ERROR: Error while calculating memory limit: Exit code: ${memoryLimitExitCode}. Falling back to ${defaultInnoDbBufferPool512M} MB."
+
+    echo "${defaultInnoDbBufferPool512M}"
+    return
+  fi
+
+  echo "${innoDbBufferPool80percent}"
+  return
 }
 
 function regularMariaDBStart() {

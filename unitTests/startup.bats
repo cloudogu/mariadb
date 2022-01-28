@@ -48,9 +48,10 @@ teardown() {
   assert_success
   assert_equal "$(mock_get_call_args "${mariadbd}" "1")" "--user=mariadb --datadir=/var/lib/mariadb --log-warnings=1"
   assert_equal "$(mock_get_call_num "${mariadbd}")" "1"
-  assert_equal "$(mock_get_call_args "${doguctl}" "1")" "config --default ERROR logging/root"
-  assert_equal "$(mock_get_call_args "${doguctl}" "2")" "state ready"
-  assert_equal "$(mock_get_call_num "${doguctl}")" "2"
+  assert_equal "$(mock_get_call_args "${doguctl}" "1")" "template /workspace/resources/default-config.cnf.tpl /workspace/resources/etc/my.cnf.d/default-config.cnf"
+  assert_equal "$(mock_get_call_args "${doguctl}" "2")" "config --default ERROR logging/root"
+  assert_equal "$(mock_get_call_args "${doguctl}" "3")" "state ready"
+  assert_equal "$(mock_get_call_num "${doguctl}")" "3"
 }
 
 @test "initMariaDB" {
@@ -101,4 +102,71 @@ teardown() {
   assert_equal "$(mock_get_call_num "${mariadb}")" "6"
 }
 
+@test "calculateInnoDbBufferPoolSize() should return 512 MB (in bytes) if no RAM limit was set" {
+  mock_set_status "${doguctl}" 0
+  mock_set_output "${doguctl}" "empty" 1
+  # shellcheck source=/workspace/resources/startup.sh
+  source "${STARTUP_DIR}/startup.sh"
 
+  run calculateInnoDbBufferPoolSize
+
+  assert_success
+  assert_line "512M"
+  assert_equal "$(mock_get_call_args "${doguctl}" "1")" "config container_config/memory_limit -d empty"
+  assert_equal "$(mock_get_call_num "${doguctl}")" "1"
+}
+
+@test "calculateInnoDbBufferPoolSize() should return 512 MB (in bytes) if RAM limit was set but is less than 512 MB" {
+  mock_set_status "${doguctl}" 0
+  mock_set_output "${doguctl}" "100m" 1
+  # shellcheck source=/workspace/resources/startup.sh
+  source "${STARTUP_DIR}/startup.sh"
+  testMemoryFile="$(mktemp)"
+  echo 100000000 > "${testMemoryFile}" # 100 MB
+  export CONTAINER_MEMORY_LIMIT_FILE="${testMemoryFile}"
+
+  run calculateInnoDbBufferPoolSize
+
+  assert_success
+  assert_line "512M"
+  assert_equal "$(mock_get_call_args "${doguctl}" "1")" "config container_config/memory_limit -d empty"
+  assert_equal "$(mock_get_call_num "${doguctl}")" "1"
+}
+
+@test "calculateInnoDbBufferPoolSize() should return 819 MB (in bytes, 80 %) if RAM limit was set to 1 GB" {
+  mock_set_status "${doguctl}" 0
+  mock_set_output "${doguctl}" "1g" 1
+
+  # shellcheck source=/workspace/resources/startup.sh
+  source "${STARTUP_DIR}/startup.sh"
+  testMemoryFile="$(mktemp)"
+  echo 1073741824 > "${testMemoryFile}" # 1024 MB
+  export CONTAINER_MEMORY_LIMIT_FILE="${testMemoryFile}"
+
+  run calculateInnoDbBufferPoolSize
+
+  assert_success
+  assert_line "858993459"
+  assert_equal "$(mock_get_call_args "${doguctl}" "1")" "config container_config/memory_limit -d empty"
+  assert_equal "$(mock_get_call_num "${doguctl}")" "1"
+}
+
+@test "renderConfigFile() should render default-config.cnf with 819 MB (in bytes) to the config directory" {
+  mock_set_status "${doguctl}" 0
+  mock_set_output "${doguctl}" "1g" 1
+
+  mkdir -p "${STARTUP_DIR}/etc/my.cnf.d/"
+  # shellcheck source=/workspace/resources/startup.sh
+  source "${STARTUP_DIR}/startup.sh"
+  testMemoryFile="$(mktemp)"
+  echo 1073741824 > "${testMemoryFile}" # 1024 MB
+  export CONTAINER_MEMORY_LIMIT_FILE="${testMemoryFile}"
+
+  run renderConfigFile
+
+  assert_success
+  assert_file_exist "${STARTUP_DIR}/etc/my.cnf.d/default-config.cnf"
+  assert_file_not_empty "${STARTUP_DIR}/etc/my.cnf.d/default-config.cnf"
+  assert_equal "$(mock_get_call_args "${doguctl}" "1")" "config container_config/memory_limit -d empty"
+  assert_equal "$(mock_get_call_num "${doguctl}")" "1"
+}
