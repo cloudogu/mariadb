@@ -3,6 +3,8 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
+# For upgrade steps see also https://mariadb.com/kb/en/upgrading-between-major-mariadb-versions/#recommended-steps
+
 function checkMajorUpgrade() {
   FROM_VERSION="${1}"
   TO_VERSION="${2}"
