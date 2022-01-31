@@ -48,10 +48,11 @@ teardown() {
   assert_success
   assert_equal "$(mock_get_call_args "${mariadbd}" "1")" "--user=mariadb --datadir=/var/lib/mariadb --log-warnings=1"
   assert_equal "$(mock_get_call_num "${mariadbd}")" "1"
-  assert_equal "$(mock_get_call_args "${doguctl}" "1")" "template /workspace/resources/default-config.cnf.tpl /workspace/resources/etc/my.cnf.d/default-config.cnf"
-  assert_equal "$(mock_get_call_args "${doguctl}" "2")" "config --default ERROR logging/root"
-  assert_equal "$(mock_get_call_args "${doguctl}" "3")" "state ready"
-  assert_equal "$(mock_get_call_num "${doguctl}")" "3"
+  assert_equal "$(mock_get_call_args "${doguctl}" "1")" "config container_config/memory_limit -d empty"
+  assert_equal "$(mock_get_call_args "${doguctl}" "2")" "template /workspace/resources/default-config.cnf.tpl /workspace/resources/etc/my.cnf.dogu.d/default-config.cnf"
+  assert_equal "$(mock_get_call_args "${doguctl}" "3")" "config --default ERROR logging/root"
+  assert_equal "$(mock_get_call_args "${doguctl}" "4")" "state ready"
+  assert_equal "$(mock_get_call_num "${doguctl}")" "4"
 }
 
 @test "initMariaDB" {
@@ -151,22 +152,20 @@ teardown() {
   assert_equal "$(mock_get_call_num "${doguctl}")" "1"
 }
 
-@test "renderConfigFile() should render default-config.cnf with 819 MB (in bytes) to the config directory" {
+@test "calculateInnoDbBufferPoolSize() should log error line when memory_limit was detected" {
   mock_set_status "${doguctl}" 0
   mock_set_output "${doguctl}" "1g" 1
 
-  mkdir -p "${STARTUP_DIR}/etc/my.cnf.d/"
   # shellcheck source=/workspace/resources/startup.sh
   source "${STARTUP_DIR}/startup.sh"
   testMemoryFile="$(mktemp)"
-  echo 1073741824 > "${testMemoryFile}" # 1024 MB
+  echo 7378697629510664192 > "${testMemoryFile}" # Something PB
   export CONTAINER_MEMORY_LIMIT_FILE="${testMemoryFile}"
 
-  run renderConfigFile
+  run calculateInnoDbBufferPoolSize
 
-  assert_success
-  assert_file_exist "${STARTUP_DIR}/etc/my.cnf.d/default-config.cnf"
-  assert_file_not_empty "${STARTUP_DIR}/etc/my.cnf.d/default-config.cnf"
+  assert_success # note: We do not fall back to a fixed value in order have the container crash so the admin needs to look at it
+  assert_line "ERROR: Detected a memory limit of > 512 GB! Was 'memory_limit' set without re-creating the container?"
   assert_equal "$(mock_get_call_args "${doguctl}" "1")" "config container_config/memory_limit -d empty"
   assert_equal "$(mock_get_call_num "${doguctl}")" "1"
 }

@@ -60,6 +60,22 @@
           "ERROR"
         ]
       }
+    },
+    {
+      "Name": "container_config/memory_limit",
+      "Description":"Limits the container's memory usage. Use a positive integer value followed by one of these units [b,k,m,g] (byte, kibibyte, mebibyte, gibibyte). If set, 80 % of the given memory will be allocated for the MariaDB's most important performance variable `innodb_buffer_pool_size`. If unset, `innodb_buffer_pool_size` will receive 512 MB. Limits will only apply properly after re-creating the container.",
+      "Optional": true,
+      "Validation": {
+        "Type": "BINARY_MEASUREMENT"
+      }
+    },
+    {
+      "Name": "container_config/swap_limit",
+      "Description":"Limits the container's swap memory usage. Use zero or a positive integer value followed by one of these units [b,k,m,g] (byte, kibibyte, mebibyte, gibibyte). 0b will disable swapping.",
+      "Optional": true,
+      "Validation": {
+        "Type": "BINARY_MEASUREMENT"
+      }
     }
   ]
 }

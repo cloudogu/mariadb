@@ -3,7 +3,9 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
-DATABASE_STORAGE=/var/lib/mariadb/ibdata1
+DATABASE_VOLUME=/var/lib/mariadb
+DATABASE_STORAGE="${DATABASE_VOLUME}/ibdata1"
+DATABASE_CONFIG_DIR="${STARTUP_DIR}/etc/my.cnf.dogu.d"
 DOGU_LOGLEVEL=2
 CONTAINER_MEMORY_LIMIT_FILE=/sys/fs/cgroup/memory/memory.limit_in_bytes
 
@@ -25,10 +27,10 @@ function initMariaDB() {
   echo "Installing MariaDB..."
   doguctl state installing
 
-  mariadb_install_db --user=mariadb --datadir="/var/lib/mariadb"
+  mariadb_install_db --user=mariadb --datadir="${DATABASE_VOLUME}"
 
   # start daemon in background
-  mariadbd --user=mariadb --datadir='/var/lib/mariadb' &
+  mariadbd --user=mariadb --datadir="${DATABASE_VOLUME}" &
   pid=$!
 
   applySecurityConfiguration
@@ -60,10 +62,12 @@ function setDoguLogLevel() {
 function renderConfigFile() {
   echo "Rendering config file..."
 
-  INNODB_BUFFER_POOL_SIZE_IN_BYTES=calculateInnoDbBufferPoolSize
+  INNODB_BUFFER_POOL_SIZE_IN_BYTES="$(calculateInnoDbBufferPoolSize)"
   export INNODB_BUFFER_POOL_SIZE_IN_BYTES
 
-  doguctl template "${STARTUP_DIR}/default-config.cnf.tpl" "${STARTUP_DIR}/etc/my.cnf.d/default-config.cnf"
+  echo "Using ${INNODB_BUFFER_POOL_SIZE_IN_BYTES} bytes for innodb_buffer_pool_size"
+
+  doguctl template "${STARTUP_DIR}/default-config.cnf.tpl" "${DATABASE_CONFIG_DIR}/default-config.cnf"
 }
 
 function calculateInnoDbBufferPoolSize() {
@@ -95,6 +99,10 @@ function calculateInnoDbBufferPoolSize() {
     return
   fi
 
+  if [[ ${memoryLimitInBytes} -gt 549755813888 ]]; then
+    >&2 echo "ERROR: Detected a memory limit of > 512 GB! Was 'memory_limit' set without re-creating the container?"
+  fi
+
   innoDbBufferPool80percent=$(echo "${memoryLimitInBytes} * 80 / 100" | bc) || memoryLimitExitCode=$?
   if [[ memoryLimitExitCode -ne 0 ]]; then
     >&2 echo "ERROR: Error while calculating memory limit: Exit code: ${memoryLimitExitCode}. Falling back to ${defaultInnoDbBufferPool512M} MB."
@@ -111,7 +119,7 @@ function regularMariaDBStart() {
   setDoguLogLevel
 
   doguctl state ready
-  mariadbd --user=mariadb --datadir='/var/lib/mariadb' --log-warnings="${DOGU_LOGLEVEL}"
+  mariadbd --user=mariadb --datadir="${DATABASE_VOLUME}" --log-warnings="${DOGU_LOGLEVEL}"
 }
 
 function applySecurityConfiguration() {

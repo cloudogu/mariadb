@@ -7,7 +7,8 @@ LABEL MAINTAINER="hello@cloudogu.com" \
 ENV MARIADB_VERSION="10.5.13-r0" \
     USER=mariadb \
     GROUP=mariadb \
-    MARIADB_VOLUME=/var/lib/mariadb
+    MARIADB_VOLUME=/var/lib/mariadb \
+    STARTUP_DIR=""
 
 # Add user and install software
 RUN set -eux -o pipefail \
@@ -24,6 +25,10 @@ RUN set -eux -o pipefail \
   && rm -rf /var/cache/apk/*  \
   && mkdir /var/run/mysqld \
   && chown -R "${USER}":"${GROUP}" "${MARIADB_VOLUME}" /var/run/mysqld /opt/lib/mariadb \
+  # create a config dir that is writable as unprivileged mariadb user during doguctl template
+  && mkdir -p /etc/my.cnf.dogu.d/ \
+  && chown "${USER}":"${GROUP}" /etc/my.cnf.dogu.d/ \
+  # change settings that come with the Alpine package
   && sed -i "s|.*bind-address\s*=.*|bind-address=0.0.0.0|g" /etc/my.cnf.d/mariadb-server.cnf \
   && sed -i "s|^skip-networking$|#skip-networking|" /etc/my.cnf.d/mariadb-server.cnf
 

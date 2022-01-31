@@ -19,6 +19,12 @@ file:
     owner: root
     group: root
     filetype: file
+  /etc/my.cnf.dogu.d/default-config.cnf:
+    exists: true
+    owner: mariadb
+    filetype: file
+    contains:
+    - 'innodb_buffer_pool_size: \d+'
   /var/lib/mariadb:
     exists: true
     owner: mariadb

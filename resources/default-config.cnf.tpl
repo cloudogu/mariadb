@@ -13,16 +13,16 @@
 innodb_buffer_pool_size={{ .Env.Get "INNODB_BUFFER_POOL_SIZE_IN_BYTES"}}
 innodb_log_file_size=16M
 
-#join_buffer_size=1M
-#sort_buffer_size=1M
-#read_buffer_size=1M
+# The Performance Schema is a feature for monitoring server performance in which the DB server populates internal tables with said monitoring data.
+# see https://mariadb.com/kb/en/performance-schema-overview/
+performance_schema = OFF
+
+# recommended settings by Alpine
+# see https://wiki.alpinelinux.org/wiki/Production_DataBases_:_mysql
 max_connections=100
-tmp_table_size=32M
 max_heap_table_size=32M
-innodb_file_format=Barracuda
-innodb_large_prefix=1
+tmp_table_size=32M
 innodb_read_io_threads=32
-performance_schema = ON enable PFS
 
 # it is suggested to generally disable the query cache
 # see https://mariadb.com/kb/en/query-cache/ and https://github.com/major/MySQLTuner-perl
