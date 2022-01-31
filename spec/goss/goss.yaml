@@ -24,7 +24,7 @@ file:
     owner: mariadb
     filetype: file
     contains:
-    - 'innodb_buffer_pool_size: \d+'
+    - 'innodb_buffer_pool_size'
   /var/lib/mariadb:
     exists: true
     owner: mariadb
