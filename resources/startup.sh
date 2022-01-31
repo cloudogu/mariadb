@@ -64,8 +64,7 @@ function renderConfigFile() {
 
   INNODB_BUFFER_POOL_SIZE_IN_BYTES="$(calculateInnoDbBufferPoolSize)"
   export INNODB_BUFFER_POOL_SIZE_IN_BYTES
-
-  echo "Using ${INNODB_BUFFER_POOL_SIZE_IN_BYTES} bytes for innodb_buffer_pool_size"
+  echo "Setting innodb_buffer_pool_size to ${INNODB_BUFFER_POOL_SIZE_IN_BYTES} bytes"
 
   doguctl template "${STARTUP_DIR}/default-config.cnf.tpl" "${DATABASE_CONFIG_DIR}/default-config.cnf"
 }
@@ -81,14 +80,14 @@ function calculateInnoDbBufferPoolSize() {
   local memoryLimitExitCode=0
   memoryLimitInBytes=$(cat < "${CONTAINER_MEMORY_LIMIT_FILE}" | tr -d '\n') || memoryLimitExitCode=$?
   if [[ memoryLimitExitCode -ne 0 ]]; then
-    >&2 echo "ERROR: Error while receiving container memory limit: Exit code: ${memoryLimitExitCode}. Falling back to ${defaultInnoDbBufferPool512M} MB."
+    logError "Error while receiving container memory limit: Exit code: ${memoryLimitExitCode}. Falling back to ${defaultInnoDbBufferPool512M} MB."
 
     echo "${defaultInnoDbBufferPool512M}"
     return
   fi
 
   if ! [[ ${memoryLimitInBytes} =~ ^[0-9]+$ ]] ; then
-    >&2 echo "ERROR: Memory limit file does not contain a number (found: ${memoryLimitInBytes}). Falling back to ${defaultInnoDbBufferPool512M} MB."
+    logError "Memory limit file does not contain a number (found: ${memoryLimitInBytes}). Falling back to ${defaultInnoDbBufferPool512M} MB."
 
     echo "${defaultInnoDbBufferPool512M}"
     return
@@ -100,12 +99,12 @@ function calculateInnoDbBufferPoolSize() {
   fi
 
   if [[ ${memoryLimitInBytes} -gt 549755813888 ]]; then
-    >&2 echo "ERROR: Detected a memory limit of > 512 GB! Was 'memory_limit' set without re-creating the container?"
+    logError "Detected a memory limit of > 512 GB! Was 'memory_limit' set without re-creating the container?"
   fi
 
   innoDbBufferPool80percent=$(echo "${memoryLimitInBytes} * 80 / 100" | bc) || memoryLimitExitCode=$?
   if [[ memoryLimitExitCode -ne 0 ]]; then
-    >&2 echo "ERROR: Error while calculating memory limit: Exit code: ${memoryLimitExitCode}. Falling back to ${defaultInnoDbBufferPool512M} MB."
+    logError "Error while calculating memory limit: Exit code: ${memoryLimitExitCode}. Falling back to ${defaultInnoDbBufferPool512M} MB."
 
     echo "${defaultInnoDbBufferPool512M}"
     return
@@ -113,6 +112,12 @@ function calculateInnoDbBufferPoolSize() {
 
   echo "${innoDbBufferPool80percent}"
   return
+}
+
+function logError() {
+  errMsg="${1}"
+
+  >&2 echo "ERROR: ${errMsg}"
 }
 
 function regularMariaDBStart() {
