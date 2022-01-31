@@ -10,7 +10,7 @@ Eine ausführliche Erläuterung befindet sich [hier](https://mariadb.com/kb/en/e
 
 ## Mapping der Level ERROR WARN INFO DEBUG
 
-### ERROR - 1
+### ERROR - [1](https://mariadb.com/kb/en/error-log/#verbosity-level-1)
 
 Das Loglevel `ERROR` stellt die Stufen 0 bis 1 des Error-Logs dar.
 
@@ -23,10 +23,10 @@ greater than maximum allowed size (8126) for a record on index leaf page.`
 #### DNS Lookup Fehler
 `[Warning] IP address '192.168.1.193' could not be resolved: Name or service not known`
 
-#### Nachrichten des Event-Shedulers
+#### Nachrichten des Event-Schedulers
 `[Note] Event Scheduler: Loaded 0 events`
 
-### WARN - 2
+### WARN - [2](https://mariadb.com/kb/en/error-log/#verbosity-level-2)
 
 Das Loglevel `WARN` stellt die Stufen 0 bis 2 des Error-Logs dar.
 
@@ -42,7 +42,7 @@ Nachrichten von ERROR +
 #### Access Denies Errors
 `[Warning] Access denied for user 'root'@'localhost' (using password: YES)`
 
-#### Table Erros
+#### Table Errors
 ```
 [Warning] Can't find record in 'tab1'.
 [Warning] Can't write; duplicate key in table 'tab1'.
@@ -51,7 +51,7 @@ Nachrichten von ERROR +
 [Warning] Update locks cannot be acquired during a READ UNCOMMITTED transaction.
 ```
 
-### INFO - 3
+### INFO - [3](https://mariadb.com/kb/en/error-log/#verbosity-level-3)
 
 Das Loglevel `INFO` stellt die Stufen 0 bis 3 des Error-Logs dar.
 
@@ -65,7 +65,7 @@ Nachrichten von ERROR und WARN +
 [Warning] Use --lc-messages-dir without language specific part instead.
 ```
 
-### DEBUG - 9
+### DEBUG - [9](https://mariadb.com/kb/en/error-log/#verbosity-level-9)
 
 Das Loglevel `DEBUG` stellt die Stufen 0 bis 9 des Error-Logs dar.
 

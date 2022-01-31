@@ -42,7 +42,7 @@ Messages from ERROR +
 #### Access Denies Errors
 `[Warning] Access denied for user 'root'@'localhost' (using password: YES)`
 
-#### Table Erros
+#### Table Errors
 ```
 [Warning] Can't find record in 'tab1'.
 [Warning] Can't write; duplicate key in table 'tab1'.
