@@ -1,0 +1,48 @@
+file:
+  /backup-consumer.sh:
+    exists: true
+    owner: root
+    group: root
+    filetype: file
+  /create-sa.sh:
+    exists: true
+    owner: root
+    group: root
+    filetype: file
+  /startup.sh:
+    exists: true
+    owner: root
+    group: root
+    filetype: file
+  /upgrade-notification.sh:
+    exists: true
+    owner: root
+    group: root
+    filetype: file
+  /etc/my.cnf.dogu.d/default-config.cnf:
+    exists: true
+    owner: mariadb
+    filetype: file
+    contains:
+    - 'innodb_buffer_pool_size'
+  /var/lib/mariadb:
+    exists: true
+    owner: mariadb
+    filetype: directory
+package:
+  mariadb:
+    installed: true
+  mariadb-client:
+    installed: true
+port:
+  tcp:3306:
+    listening: true
+    ip:
+    - 0.0.0.0
+process:
+  mariadbd:
+    running: true
+mount:
+  /var/lib/mariadb:
+    exists: true
+    filesystem: btrfs
