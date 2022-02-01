@@ -98,7 +98,7 @@ timestamps {
                 String releaseVersion = git.getSimpleBranchName()
 
                 stage('Finish Release') {
-                    gitflow.finishRelease(releaseVersion)
+                    gitflow.finishRelease(releaseVersion, "main")
                 }
 
                 stage('Push Dogu to registry') {
