@@ -2,7 +2,7 @@ FROM registry.cloudogu.com/official/base:3.14.2-2
 
 LABEL MAINTAINER="hello@cloudogu.com" \
         NAME="official/mariadb" \
-        VERSION="10.5.13-0"
+        VERSION="10.5.13-1"
 
 ENV MARIADB_VERSION="10.5.13-r0" \
     USER=mariadb \
